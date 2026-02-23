@@ -40,11 +40,15 @@ def get_employee_activity():
         select json_agg(t)
         from (
             select
-                user_id,
-                count(*) as uploads,
-                sum(total) as total_earnings
-            from transactions
-            group by user_id
+                u.raw_user_meta_data->>'full_name' as employee_name,
+                t.user_id,
+                count(*) as total_uploads,
+                sum(t.total) as total_earnings,
+                max(t.date) as last_upload
+            from transactions t
+            left join auth.users u on u.id = t.user_id
+            group by t.user_id, u.raw_user_meta_data->>'full_name'
+            order by total_uploads desc
         ) t;
     """
 
@@ -58,7 +62,7 @@ def get_top_stores():
         from (
             select
                 store_name,
-                count(*) as count,
+                count(*) as transaction_count,
                 sum(total) as total_spent
             from transactions
             group by store_name

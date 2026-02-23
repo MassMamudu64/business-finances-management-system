@@ -4,6 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
+const API_URL = "http://127.0.0.1:8000";
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -12,35 +14,41 @@ export default function LoginPage() {
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
+    setError("");
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/auth/login", {
+      const res = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
       });
 
-      localStorage.setItem("token", res.data.access_token);
+      const { access_token, role } = res.data;
 
-      router.push("/admin");
-    } catch (err) {
+      localStorage.setItem("token", access_token);
+      localStorage.setItem("role", role);
+
+      router.push(role === "admin" ? "/admin" : "/employee");
+    } catch {
       setError("Invalid email or password");
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
       <form
         onSubmit={handleLogin}
-        className="bg-white p-6 rounded shadow w-96"
+        className="bg-white dark:bg-gray-800 p-6 rounded shadow w-96"
       >
-        <h1 className="text-2xl font-bold mb-4">Admin Login</h1>
+        <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+          Login
+        </h1>
 
         {error && <p className="text-red-500 mb-2">{error}</p>}
 
         <input
           type="email"
           placeholder="Email"
-          className="w-full p-2 border rounded mb-3"
+          className="w-full p-2 border rounded mb-3 dark:bg-gray-700 dark:text-white"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -48,14 +56,14 @@ export default function LoginPage() {
         <input
           type="password"
           placeholder="Password"
-          className="w-full p-2 border rounded mb-3"
+          className="w-full p-2 border rounded mb-3 dark:bg-gray-700 dark:text-white"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded"
         >
           Login
         </button>

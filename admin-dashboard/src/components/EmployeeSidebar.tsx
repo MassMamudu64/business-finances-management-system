@@ -2,23 +2,16 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  LayoutDashboard,
-  BarChart2,
-  Users,
-  Store,
-  LogOut,
-} from "lucide-react";
+import { Upload, History, User, LogOut } from "lucide-react";
 import DarkModeToggle from "@/components/DarkModeToggle";
 
 const links = [
-  { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={18} /> },
-  { name: "Monthly Report", href: "/admin/monthly", icon: <BarChart2 size={18} /> },
-  { name: "Employees", href: "/admin/employees", icon: <Users size={18} /> },
-  { name: "Stores", href: "/admin/stores", icon: <Store size={18} /> },
+  { name: "Upload Receipt", href: "/employee/upload", icon: <Upload size={18} /> },
+  { name: "My Uploads", href: "/employee/uploads", icon: <History size={18} /> },
+  { name: "Profile", href: "/employee/profile", icon: <User size={18} /> },
 ];
 
-export default function AdminSidebar() {
+export default function EmployeeSidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -29,7 +22,7 @@ export default function AdminSidebar() {
 
   return (
     <aside className="w-64 h-screen bg-gray-900 dark:bg-gray-950 text-white flex flex-col p-4">
-      <h1 className="text-2xl font-bold mb-8">Admin Panel</h1>
+      <h1 className="text-2xl font-bold mb-8">Employee Panel</h1>
 
       <nav className="flex flex-col gap-2 flex-1">
         {links.map((link) => {
