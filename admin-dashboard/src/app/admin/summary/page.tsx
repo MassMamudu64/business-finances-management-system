@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import SummaryCard from "@/components/SummaryCard";
 import {
   DollarSign,
@@ -11,21 +10,16 @@ import {
   Coins,
 } from "lucide-react";
 
+import { fetchAdminSummary } from "@/utils/api";
+
 export default function SummaryPage() {
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    axios
-      .get("http://127.0.0.1:8000/admin/summary", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => setSummary(res.data))
-      .catch((err) => console.error(err))
+    fetchAdminSummary()
+      .then((data) => setSummary(data))
+      .catch((err) => console.error("Failed to load summary", err))
       .finally(() => setLoading(false));
   }, []);
 

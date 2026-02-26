@@ -1,23 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Skeleton from "@/components/Skeleton";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from "recharts";
+
+import { fetchAdminMonthly } from "@/utils/api";
 
 export default function MonthlyPage() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    axios
-      .get("http://127.0.0.1:8000/admin/monthly", {
-        headers: { Authorization: `Bearer ${token}` },
+    fetchAdminMonthly()
+      .then((res) => setData(res || []))
+      .catch((err) => {
+        console.error("Failed to load monthly analytics", err);
       })
-      .then((res) => setData(res.data || []))
       .finally(() => setLoading(false));
   }, []);
 

@@ -4,13 +4,14 @@ import { useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 
+import { getToken } from "@/utils/auth";
+
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    if (!token || role !== "admin") router.push("/login");
+    const token = getToken();
+    if (!token) router.push("/login");
   }, [router]);
 
   return (

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import { Upload, FileText, Image as Img } from "lucide-react";
+
+import { getApiErrorMessage, uploadEmployeeReceipt } from "@/utils/api";
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -14,17 +15,11 @@ export default function UploadPage() {
     if (!file) return setError("Select a file first");
     setLoading(true), setError(""), setResult(null);
 
-    const token = localStorage.getItem("token");
-    const form = new FormData();
-    form.append("file", file);
-
     try {
-      const res = await axios.post("http://127.0.0.1:8000/employee/upload", form, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setResult(res.data);
-    } catch {
-      setError("Upload failed");
+      const data = await uploadEmployeeReceipt(file);
+      setResult(data);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
     } finally {
       setLoading(false);
     }

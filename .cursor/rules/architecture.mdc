@@ -1,0 +1,26 @@
+---
+alwaysApply: true
+---
+
+# Finance Management System Architecture Rules
+
+- **Backend as source of truth**: All financial data, KPIs, analytics, and RBAC decisions must come from the FastAPI + Supabase backend. The frontend must not re-compute, infer, or override backend values.
+
+- **HTTP client usage (frontend)**:
+  - Use the shared Axios client in [admin-dashboard/src/utils/api.ts](mdc:admin-dashboard/src/utils/api.ts) for all HTTP requests.
+  - Do **not** call `fetch` or `axios` directly in React components; instead, use exported helpers or hooks from the utils layer.
+  - JWTs are injected automatically by Axios interceptors using Supabase tokens; components should never manually attach `Authorization` headers.
+
+- **Auth & roles**:
+  - Supabase Auth is the only identity provider. Tokens come from the backend and are treated as opaque blobs in the frontend.
+  - Role checks and permission logic (admin vs employee) live exclusively in the backend, primarily via guards in [Store_FastAPI/backend/app/core/auth_guard.py](mdc:Store_FastAPI/backend/app/core/auth_guard.py).
+  - Frontend must not trust or persist role state for authorization; navigation can follow backend-provided links/paths, but access control decisions are enforced server-side.
+
+- **Error handling**:
+  - Backend endpoints should return structured errors of the shape `{ "error": string, "message": string }` rather than generic strings.
+  - Frontend should surface these messages via centralized error handling in the shared Axios client / helpers, avoiding silent failures.
+
+- **Security & data flow**:
+  - No secrets or service keys are bundled into the frontend; all sensitive configuration remains in the backend.
+  - Receipt/OCR and document processing happens only in backend services (e.g. [Store_FastAPI/backend/app/services](mdc:Store_FastAPI/backend/app/services)); the frontend only uploads files and displays backend results.
+

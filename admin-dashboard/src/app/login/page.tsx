@@ -1,35 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const API_URL = "http://127.0.0.1:8000";
+import { getApiErrorMessage, login as loginRequest } from "@/utils/api";
+import { setToken } from "@/utils/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (searchParams.get("expired")) {
+      setError("Your session has expired. Please log in again.");
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, {
-        email,
-        password,
-      });
+      const res = await loginRequest({ email, password });
 
-      const { access_token, role } = res.data;
+      const { access_token, dashboard_path } = res.data;
 
-      localStorage.setItem("token", access_token);
-      localStorage.setItem("role", role);
+      setToken(access_token);
 
-      router.push(role === "admin" ? "/admin" : "/employee");
-    } catch {
-      setError("Invalid email or password");
+      router.push(dashboard_path || "/admin");
+    } catch (err) {
+      setError(getApiErrorMessage(err));
     }
   };
 

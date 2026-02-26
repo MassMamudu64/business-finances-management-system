@@ -1,20 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Skeleton from "@/components/Skeleton";
+
+import { fetchAdminEmployees } from "@/utils/api";
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    axios
-      .get("http://127.0.0.1:8000/admin/employees", {
-        headers: { Authorization: `Bearer ${token}` },
+    fetchAdminEmployees()
+      .then((res) => setEmployees(res || []))
+      .catch((err) => {
+        console.error("Failed to load employees", err);
       })
-      .then((res) => setEmployees(res.data || []))
       .finally(() => setLoading(false));
   }, []);
 

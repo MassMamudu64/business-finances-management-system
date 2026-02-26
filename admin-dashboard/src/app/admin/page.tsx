@@ -1,22 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import SummaryCard from "@/components/SummaryCard";
 import Skeleton from "@/components/Skeleton";
 import { DollarSign, Wallet, TrendingUp, Receipt, Coins } from "lucide-react";
+
+import { fetchAdminSummary } from "@/utils/api";
 
 export default function AdminDashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    axios
-      .get("http://127.0.0.1:8000/admin/summary", {
-        headers: { Authorization: `Bearer ${token}` },
+    fetchAdminSummary()
+      .then((res) => setData(res))
+      .catch((err) => {
+        console.error("Failed to load admin summary", err);
       })
-      .then((res) => setData(res.data))
       .finally(() => setLoading(false));
   }, []);
 
